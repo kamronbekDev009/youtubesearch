@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>YouTube Search</title>
+</head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<body>
+    <main class="container">
+        <div class="d-flex justify-content-center align-items-center my-3">
+        <input type="text" id="query" name="" class="form-control">
+        <button onclick="showData()" class="btn btn-primary mx-2">Search</button>
+    </div>
+  <div id="search-results" class="row"></div>
+
+    </main>
+ 
+  
+  <script>
+    function showData(){
+    // Replace 'YOUR_API_KEY' with your actual YouTube Data API key
+    var apiKey = 'AIzaSyBrAaINvqsankBolS0XobVfsYpErhZ-oSs';
+    var searchQuery = document.querySelector("#query").value
+
+    if (searchQuery==="") {
+      alert("Write something else!")
+      return false
+    }
+    else{
+
+    // Construct the YouTube Data API URL with search parameters
+    var apiUrl = 'https://youtube.googleapis.com/youtube/v3/search?' +
+      'part=snippet' +
+      '&maxResults=10' +
+      '&q=' + encodeURIComponent(searchQuery) +
+      '&videoEmbeddable=any' +
+      '&videoType=any' +
+      '&key=' + apiKey;
+
+    // Fetch the YouTube search results
+    fetch(apiUrl)
+      .then(function(response) {
+        if (response.ok) {
+          return response.json();
+
+
+        } else {
+          throw new Error('Error occurred while fetching search results. Status: ' + response.status);
+        }
+      })
+      .then(function(data) {
+        document.querySelector("#query").value=''
+        // Process the API response and display the search results
+        var resultsContainer = document.getElementById('search-results');
+
+        data.items.forEach(function(item) {
+          var videoId = item.id.videoId;
+          var title = item.snippet.title;
+          var VideoContainer=document.createElement("div");
+          VideoContainer.classList.add("col-md-3", "mx-3");
+          var videoFrame=document.createElement('iframe')
+          VideoContainer.appendChild(videoFrame)
+          videoFrame.src='https://www.youtube.com/embed/'+videoId;
+          videoFrame.setAttribute("allowfullscreen", "true")
+
+
+          /*var videoFrame = document.createElement('iframe');
+          videoFrame.src = 'https://www.youtube.com/embed/' + videoId;*/
+          
+
+
+          resultsContainer.appendChild(VideoContainer);
+        });
+      })
+      .catch(function(error) {
+        console.error('Error occurred while fetching search results:', error);
+      });
+
+    }
+  }
+  </script>
+</body>
+</html>
